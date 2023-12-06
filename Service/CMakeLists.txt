@@ -1,7 +1,3 @@
-include_directories(${RootDir}/Service/Acceptor)
-include_directories(${RootDir}/Service/Reactor)
-include_directories(${RootDir}/Service/Packet)
-include_directories(${RootDir}/Service/Session)
 
 aux_source_directory(${RootDir}/Service/Acceptor src)
 aux_source_directory(${RootDir}/Service/Reactor src)

@@ -21,7 +21,9 @@ ssize_t SocketPacket::Decode()
     // 本次数据包中数据的长度大于原始数据字节序列长度, 继续接收
     if (head.dataLen > len_ - headLen) return 0;
     // 数据包完整合法, 拷贝解包后的数据
-    content_ = std::string(origin_ + headLen, head.dataLen);
+    RequestPacketStart = origin_ + headLen;
+    RequestPacketLen = head.dataLen;
+    
     return headLen + head.dataLen;
 
 }

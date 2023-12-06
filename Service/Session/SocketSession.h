@@ -3,16 +3,17 @@
 
 #include "../Reactor/EventHandler.h"
 #include "../Packet/SocketPacket.h"
+#include "../Packet/RequestPacket.h"
 #include <string>
 
 
-class Session : public EventHandler
+class SocketSession : public EventHandler
 {
 public:
     static const size_t MAX_BUF = 65536 * 60;
 public:
-    Session(const std::string& clientIP, uint16_t port, uint16_t clientFd);
-    ~Session() override;
+    SocketSession(const std::string& clientIP, uint16_t port, uint16_t clientFd);
+    ~SocketSession() override;
     int OnEpollEvent(uint32_t events) override;
 private:
     void ProcessSocketPacket(const SocketPacket& SocketPacket);
@@ -23,5 +24,5 @@ private:
     size_t recvStart_ = 0;
     size_t recvEnd_ = 0;
     char sendBuf_[MAX_BUF]{0};
-    // std::string sessionId_;
+    // std::string SocketSessionId_;
 };

@@ -4,7 +4,11 @@
 #pragma once
 
 #include <cinttypes>
+#include "../DataStructure/Constexpr.h"
 
+namespace TradeGateway
+{
+    
 enum class ResponseType
 {
     None = 0,               
@@ -21,9 +25,17 @@ enum class ResponseType
 
 };
 
+struct ErrorMessage
+{
+    uint8_t errorID;
+    char message[MAX_ERRORMESSAGE_LEN];
+};
+
 struct ResponsePacketHead
 {
-    std::uint32_t requestId;
-
+    uint32_t requestId;
     ResponseType   requestType;
+    ErrorMessage errorMessage;
+};
+
 };

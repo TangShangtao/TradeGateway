@@ -1,5 +1,5 @@
 #include "Acceptor.h"
-#include "Session.h"
+#include "../Session/SocketSession.h"
 #include "Logger.h"
 
 #include <sys/socket.h>
@@ -72,9 +72,9 @@ int Acceptor::OnEpollEvent(uint32_t events)
                 }
             }
             ERROR("Acceptor new client connection");
-            // 将clientFd封装为Session, 放入Reactor, 在Reactor处delete
-            auto session = new Session(inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port), clientFd);
-            Reactor::GetInstance().AddHandler(session);
+            // 将clientFd封装为SocketSession, 放入Reactor, 在Reactor处delete
+            auto socketSession = new SocketSession(inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port), clientFd);
+            Reactor::GetInstance().AddHandler(socketSession);
         }
 
     }

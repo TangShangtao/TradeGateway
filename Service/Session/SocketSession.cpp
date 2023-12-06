@@ -1,21 +1,22 @@
-#include "Session.h"
+#include "SocketSession.h"
 #include "Logger.h"
 
 #include <iostream>
 // #include <sys/socket.h>
 #include <unistd.h>
 #include <cstring>
-Session::Session(const std::string& clientIP, uint16_t port, uint16_t clientFd)
+#include <memory>
+SocketSession::SocketSession(const std::string& clientIP, uint16_t port, uint16_t clientFd)
 {
     fd_ = clientFd;
     events_ = EPOLLERR | EPOLLHUP | EPOLLIN | EPOLLOUT;
     clientAddr_ = clientIP + ":" + std::to_string(port);
-    name_ = fmt::format("Session clientAddr {}", clientAddr_);
+    name_ = fmt::format("SocketSession clientAddr {}", clientAddr_);
 }
 
-Session::~Session() = default;
+SocketSession::~SocketSession() = default;
 
-int Session::OnEpollEvent(uint32_t events)
+int SocketSession::OnEpollEvent(uint32_t events)
 {
     if (events & (EPOLLERR | EPOLLHUP))
     {
@@ -93,7 +94,27 @@ int Session::OnEpollEvent(uint32_t events)
     }
 }
 
-void Session::ProcessSocketPacket(const SocketPacket &socketPacket)
+void SocketSession::ProcessSocketPacket(const SocketPacket &socketPacket)
 {
-    INFO("clientAddr {} Processing... {}", clientAddr_, socketPacket.content_);
+    INFO("clientAddr {} Processing... {}", clientAddr_, std::string(socketPacket.RequestPacketStart));
+    auto requestPacket = RequestPacket(socketPacket.RequestPacketStart, socketPacket.RequestPacketLen);
+    auto requestHead = requestPacket.Decode();
+    switch (requestHead.requestType)
+    {
+        // case RequestType::Login:
+        //     RequestDataLen = sizeof();
+        // case RequestType::OrderInsert:
+        //     RequestDataLen = sizeof();
+        // case RequestType::OrderCancel:
+        //     RequestDataLen = sizeof();
+        // case RequestType::QryAsset:
+        //     RequestDataLen = sizeof();
+        // case RequestType::QryPosition:
+        //     RequestDataLen = sizeof();
+        // case RequestType::QryOrder:
+        //     RequestDataLen = sizeof();
+        // case RequestType::QryTrade:
+        //     RequestDataLen = sizeof();
+    }
+    // std::make_shared<>
 }

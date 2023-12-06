@@ -1,0 +1,12 @@
+include_directories(${RootDir}/Service/Acceptor)
+include_directories(${RootDir}/Service/Reactor)
+include_directories(${RootDir}/Service/Packet)
+include_directories(${RootDir}/Service/Session)
+
+aux_source_directory(${RootDir}/Service/Acceptor src)
+aux_source_directory(${RootDir}/Service/Reactor src)
+aux_source_directory(${RootDir}/Service/Session src)
+aux_source_directory(${RootDir}/Service/Packet src)
+
+add_library(Service SHARED ${src})
+target_link_libraries(Service ToolKit)

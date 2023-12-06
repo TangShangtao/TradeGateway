@@ -17,3 +17,4 @@ link_directories(${RootDir}/lib)
 # 子项目
 add_subdirectory(ToolKit)
 add_subdirectory(Test)
+add_subdirectory(Service)

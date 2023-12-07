@@ -6,6 +6,7 @@
 #include "../Packet/RequestPacket.h"
 #include <string>
 
+using namespace TradeGateway;
 
 class SocketSession : public EventHandler
 {
@@ -16,7 +17,8 @@ public:
     ~SocketSession() override;
     int OnEpollEvent(uint32_t events) override;
 private:
-    void ProcessSocketPacket(const SocketPacket& SocketPacket);
+    void ProcessSocketPacket(const SocketPacket& socketPacket);
+    // void ProcessResponsePacket(const Response& req)
 private:
     std::string clientAddr_;
 

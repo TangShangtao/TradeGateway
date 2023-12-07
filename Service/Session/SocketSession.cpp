@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <memory>
+
 SocketSession::SocketSession(const std::string& clientIP, uint16_t port, uint16_t clientFd)
 {
     fd_ = clientFd;
@@ -56,8 +57,8 @@ int SocketSession::OnEpollEvent(uint32_t events)
             // 这个do while用于处理一个read得出多个包的情况，进行拆分，若read得到不完整的包，则继续read
             do
             {
-                auto socketPacket = SocketPacket(recvBuf_ + recvStart_, recvEnd_ - recvStart_);
-                result = socketPacket.Decode();
+                SocketPacket packet;
+                result = packet.Decode(recvBuf_ + recvStart_, recvEnd_ - recvStart_);
                 // 1.包不合法, 断开连接
                 if (result == -1)
                 {
@@ -73,7 +74,7 @@ int SocketSession::OnEpollEvent(uint32_t events)
                 else
                 {
                     recvStart_ += result;
-                    ProcessSocketPacket(socketPacket);
+                    ProcessSocketPacket(packet);
                 }
             } while (result > 0 && recvEnd_ - recvStart_ > 0);
 
@@ -97,24 +98,46 @@ int SocketSession::OnEpollEvent(uint32_t events)
 void SocketSession::ProcessSocketPacket(const SocketPacket &socketPacket)
 {
     INFO("clientAddr {} Processing... {}", clientAddr_, std::string(socketPacket.RequestPacketStart));
-    auto requestPacket = RequestPacket(socketPacket.RequestPacketStart, socketPacket.RequestPacketLen);
-    auto requestHead = requestPacket.Decode();
+    RequestPacket requestPacket;
+    auto requestHead = requestPacket.Decode(socketPacket.RequestPacketStart, socketPacket.RequestPacketLen);
     switch (requestHead.requestType)
     {
-        // case RequestType::Login:
-        //     RequestDataLen = sizeof();
-        // case RequestType::OrderInsert:
-        //     RequestDataLen = sizeof();
-        // case RequestType::OrderCancel:
-        //     RequestDataLen = sizeof();
-        // case RequestType::QryAsset:
-        //     RequestDataLen = sizeof();
-        // case RequestType::QryPosition:
-        //     RequestDataLen = sizeof();
-        // case RequestType::QryOrder:
-        //     RequestDataLen = sizeof();
-        // case RequestType::QryTrade:
-        //     RequestDataLen = sizeof();
+        case RequestType::ReqLogin:
+            LoginReq loginReq;
+            memcpy(&loginReq, requestPacket.RequestDataStart, sizeof(LoginReq));
+            DEBUG("clientAddr {}, ReqLogin, info: {}", clientAddr_, req.DebugInfo());
+            // TODO
+        case RequestType::ReqOrderInsert:
+            OrderInsertReq orderInsertReq;
+            memcpy(&orderInsertReq, requestPacket.RequestDataStart, sizeof(OrderInsertReq));
+            DEBUG("clientAddr {}, ReqOrderInsert, info: {}", clientAddr_, req.DebugInfo());
+
+        case RequestType::ReqOrderCancel:
+            OrderCancelReq orderCancelReq;
+            memcpy(&orderCancelReq, requestPacket.RequestDataStart, sizeof(OrderCancelReq));
+            DEBUG("clientAddr {}, ReqOrderCancel, info: {}", clientAddr_, req.DebugInfo());
+
+        case RequestType::ReqQryAsset:
+            QryAssetReq qryAssetReq;
+            memcpy(&qryAssetReq, requestPacket.RequestDataStart, sizeof(QryAssetReq));
+            DEBUG("clientAddr {}, ReqQryAsset, info: {}", clientAddr_, req.DebugInfo());
+
+        case RequestType::ReqQryPosition:
+            QryPositionReq qryPositionReq;
+            memcpy(&qryPositionReq, requestPacket.RequestDataStart, sizeof(QryPositionReq));
+            DEBUG("clientAddr {}, ReqQryPosition, info: {}", clientAddr_, req.DebugInfo());
+
+        case RequestType::ReqQryOrder:
+            QryOrderReq qryOrderReq;
+            memcpy(&qryOrderReq, requestPacket.RequestDataStart, sizeof(QryOrderReq));
+            DEBUG("clientAddr {}, ReqQryOrder, info: {}", clientAddr_, req.DebugInfo());
+
+        case RequestType::ReqQryTrade:
+            QryTradeReq qryTradeReq;
+            memcpy(&qryTradeReq, requestPacket.RequestDataStart, sizeof(QryTradeReq));
+            DEBUG("clientAddr {}, ReqQryTrade, info: {}", clientAddr_, req.DebugInfo());
+
+        case RequestType::None:
+            ERROR("clientAddr {}, requestType parse error", clientAddr_);
     }
-    // std::make_shared<>
 }

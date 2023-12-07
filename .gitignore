@@ -7,3 +7,4 @@ lib/
 build/
 logs/
 .clion.source.upload.marker
+.cache/

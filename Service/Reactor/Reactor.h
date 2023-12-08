@@ -21,7 +21,6 @@ public:
     ~Reactor();
 
     void AddHandler(EventHandler* handler);
-
     [[noreturn]] void Run(bool isBusyWait=false);
 
 private:

@@ -2,7 +2,7 @@
 #include "Logger.h"
 
 #include <iostream>
-// #include <sys/socket.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <cstring>
 #include <memory>
@@ -58,7 +58,9 @@ int SocketSession::OnEpollEvent(uint32_t events)
             do
             {
                 SocketPacket packet;
-                result = packet.Decode(recvBuf_ + recvStart_, recvEnd_ - recvStart_);
+                packet.SetSocketPacket(recvBuf_ + recvStart_, recvEnd_ - recvStart_);
+                // socket数据包解出request数据包
+                result = packet.Decode();
                 // 1.包不合法, 断开连接
                 if (result == -1)
                 {
@@ -70,11 +72,12 @@ int SocketSession::OnEpollEvent(uint32_t events)
                 {
                     // std::cout << "continue read..." << std::endl;
                 }
-                // 3.解析出一个包
+                // 3.解析出一个请求包
                 else
                 {
                     recvStart_ += result;
-                    ProcessSocketPacket(packet);
+                    auto requestPacket = packet.GetRequestPacket();
+                    ProcessRequestPacket(requestPacket.first, requestPacket.second);
                 }
             } while (result > 0 && recvEnd_ - recvStart_ > 0);
 
@@ -95,49 +98,87 @@ int SocketSession::OnEpollEvent(uint32_t events)
     }
 }
 
-void SocketSession::ProcessSocketPacket(const SocketPacket &socketPacket)
+void SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t requestPacketLen)
 {
-    INFO("clientAddr {} Processing... {}", clientAddr_, std::string(socketPacket.RequestPacketStart));
-    RequestPacket requestPacket;
-    auto requestHead = requestPacket.Decode(socketPacket.RequestPacketStart, socketPacket.RequestPacketLen);
-    switch (requestHead.requestType)
+    DEBUG("clientAddr {} Processing... {}", clientAddr_, std::string(requestPacketStart));
+    
+    RequestPacketHead head;
+    memset(&head, 0, sizeof(RequestPacketHead));
+    // 直接强转, 解析业务请求数据包头
+    memcpy(&head, requestPacketStart, sizeof(RequestPacketHead));
+    const char* requestDataStart = requestPacketStart + sizeof(RequestPacketHead);
+    switch (head.requestType)
     {
         case RequestType::ReqLogin:
             LoginReq loginReq;
-            memcpy(&loginReq, requestPacket.RequestDataStart, sizeof(LoginReq));
+            memcpy(&loginReq, requestDataStart, sizeof(LoginReq));
             DEBUG("clientAddr {}, ReqLogin, info: {}", clientAddr_, req.DebugInfo());
             // TODO
         case RequestType::ReqOrderInsert:
             OrderInsertReq orderInsertReq;
-            memcpy(&orderInsertReq, requestPacket.RequestDataStart, sizeof(OrderInsertReq));
+            memcpy(&orderInsertReq, requestDataStart, sizeof(OrderInsertReq));
             DEBUG("clientAddr {}, ReqOrderInsert, info: {}", clientAddr_, req.DebugInfo());
 
         case RequestType::ReqOrderCancel:
             OrderCancelReq orderCancelReq;
-            memcpy(&orderCancelReq, requestPacket.RequestDataStart, sizeof(OrderCancelReq));
+            memcpy(&orderCancelReq, requestDataStart, sizeof(OrderCancelReq));
             DEBUG("clientAddr {}, ReqOrderCancel, info: {}", clientAddr_, req.DebugInfo());
 
         case RequestType::ReqQryAsset:
             QryAssetReq qryAssetReq;
-            memcpy(&qryAssetReq, requestPacket.RequestDataStart, sizeof(QryAssetReq));
+            memcpy(&qryAssetReq, requestDataStart, sizeof(QryAssetReq));
             DEBUG("clientAddr {}, ReqQryAsset, info: {}", clientAddr_, req.DebugInfo());
 
         case RequestType::ReqQryPosition:
             QryPositionReq qryPositionReq;
-            memcpy(&qryPositionReq, requestPacket.RequestDataStart, sizeof(QryPositionReq));
+            memcpy(&qryPositionReq, requestDataStart, sizeof(QryPositionReq));
             DEBUG("clientAddr {}, ReqQryPosition, info: {}", clientAddr_, req.DebugInfo());
 
         case RequestType::ReqQryOrder:
             QryOrderReq qryOrderReq;
-            memcpy(&qryOrderReq, requestPacket.RequestDataStart, sizeof(QryOrderReq));
+            memcpy(&qryOrderReq, requestDataStart, sizeof(QryOrderReq));
             DEBUG("clientAddr {}, ReqQryOrder, info: {}", clientAddr_, req.DebugInfo());
 
         case RequestType::ReqQryTrade:
             QryTradeReq qryTradeReq;
-            memcpy(&qryTradeReq, requestPacket.RequestDataStart, sizeof(QryTradeReq));
+            memcpy(&qryTradeReq, requestDataStart, sizeof(QryTradeReq));
             DEBUG("clientAddr {}, ReqQryTrade, info: {}", clientAddr_, req.DebugInfo());
 
         case RequestType::None:
             ERROR("clientAddr {}, requestType parse error", clientAddr_);
     }
+}
+
+void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen)
+{
+    DEBUG("Processing response to clientAddr {}, response: {}", clientAddr_, std::string(responsePacketStart));
+    // 构造业务回报数据包头
+    ResponsePacketHead head;
+    memset(&head, 0, sizeof(ResponsePacketHead));
+    head.responseType = type;
+    head.errorMessage = errorMessage;
+    head.requestId = reqId;
+    SocketPacket packet;
+    packet.SetResponsePacket(responseDataStart, responseDataLen, (char*)&head);
+
+    auto packeLen = packet.Encode(sendBuf_ + sendEnd_, MAX_BUF - sendEnd_);
+    sendEnd_ += packeLen;
+    
+    size_t sendLen = 0;
+    ssize_t len = 0;
+    do
+    {
+        len = send(fd_, sendBuf_ + sendLen, sendEnd_ - sendLen, 0);
+        if (len <= 0)
+        {
+            ERROR("client {} send ret {} errno {} err msg {} sendLen:{}", clientAddr_, len, errno, strerror(errno), sendLen);
+            break;
+        }
+        else
+        {
+            sendLen += len;
+        }
+    } while (sendLen < sendEnd_);
+    DEBUG("Send response to clientAddr {}", clientAddr_);
+    
 }

@@ -3,7 +3,6 @@
 
 #include "../Reactor/EventHandler.h"
 #include "../Packet/SocketPacket.h"
-#include "../Packet/RequestPacket.h"
 #include <string>
 
 using namespace TradeGateway;
@@ -17,14 +16,18 @@ public:
     ~SocketSession() override;
     int OnEpollEvent(uint32_t events) override;
 private:
-    void ProcessSocketPacket(const SocketPacket& socketPacket);
-    // void ProcessResponsePacket(const Response& req)
+    // request数据包进行解包， 解出request请求数据, 进行业务处理
+    void ProcessRequestPacket(const char* requestPacketStart, uint32_t requestPacketLen);
+    // response回报数据进行封包, 得到回报数据包，发送给客户端
+    void ProcessResponseData(ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen);
 private:
     std::string clientAddr_;
 
     char recvBuf_[MAX_BUF]{0};
     size_t recvStart_ = 0;
     size_t recvEnd_ = 0;
+    
     char sendBuf_[MAX_BUF]{0};
+    size_t sendEnd_ = 0;
     // std::string SocketSessionId_;
 };

@@ -3,9 +3,7 @@
 */
 #pragma once
 
-#include "IPC/SocketPacketHead.h"
-#include "IPC/RequestPacketHead.h"
-#include "IPC/ResponsePacketHead.h"
+#include "IPC/PacketHead.h"
 #include "IPC/RequestData.h"
 #include "IPC/ResponseData.h"
 

@@ -12,6 +12,7 @@ Reactor::Reactor()
 Reactor::~Reactor()
 {
     close(epollFd_);
+    INFO("Reactor析构");
 }
 
 void Reactor::MakeSocketNonBlocking(int fd)

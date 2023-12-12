@@ -16,7 +16,7 @@ struct LoginReq
 
     std::string DebugInfo()
     {
-        return std::string(loginString) + ",";
+        return std::string(loginString);
     }
 };
 
@@ -33,10 +33,10 @@ struct OrderInsertReq
     {
         return std::string(code) + "," 
              + std::string(orderRef) + ","
-             + std::to_string((int)direction) + ","
-             + std::to_string((int)offset) + ","
-             + std::to_string((int)limitPrice) + ","
-             + std::to_string((int)volume) + ",";
+             + std::to_string((uint8_t)direction) + ","
+             + std::to_string((uint8_t)offset) + ","
+             + std::to_string((uint8_t)limitPrice) + ","
+             + std::to_string((uint8_t)volume);
     }
 };
 
@@ -50,7 +50,7 @@ struct OrderCancelReq
     {
         return std::string(orderSysID) + "," 
              + std::string(orderRef) + ","
-             + std::to_string((int)exchange) + ",";
+             + std::to_string((uint8_t)exchange);
     }
 };
 

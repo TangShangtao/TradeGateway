@@ -18,7 +18,7 @@ public:
     ssize_t Decode();
     std::pair<const char*, uint32_t> GetRequestPacket();
     //  对回报数据包进行封包，封装出socket数据包, 拷贝至sendBuf处
-    void SetResponsePacket(const char* responseDataStart, uint32_t responseDataLen, const char* responseHeadStart);
+    void SetResponsePacket(const char* responseHeadStart, const char* responseDataStart, uint32_t responseDataLen);
     ssize_t Encode(char* socketPacketStart, size_t socketPacketLen);
 
 private:

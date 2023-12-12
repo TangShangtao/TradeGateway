@@ -80,7 +80,7 @@ int Acceptor::OnEpollEvent(uint32_t events)
     }
     else
     {
-        std::cout << "acceptor error epoll event" << std::endl;
+        ERROR("acceptor error epoll event");
         return -1;
     }
 

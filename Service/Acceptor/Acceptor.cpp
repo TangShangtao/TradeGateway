@@ -10,7 +10,7 @@ Acceptor::Acceptor()
     fd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (fd_ == -1)
     {
-        ERROR("Acceptor socket fd error");
+        ERROR("error: socket fd error");
     }
     events_ = EPOLLIN | EPOLLET;
     name_ = "Acceptor";
@@ -31,21 +31,21 @@ void Acceptor::Listen(uint16_t port)
     ret = setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     if (ret == -1)
     {
-        ERROR("Acceptor setsockopt error");
+        ERROR("error: setsockopt error");
         exit(-1);
     }
     // 绑定端口
     ret = bind(fd_, (struct sockaddr*)&server_addr, sizeof(server_addr));
     if (ret == -1)
     {
-        ERROR("Acceptor bind error");
+        ERROR("error: bind error");
         exit(-1);
     }
     // 监听
     ret = listen(fd_, 64);
     if (ret == -1)
     {
-        ERROR("Acceptor listen error");
+        ERROR("error: listen error");
         exit(-1);
     }
     // 添加至reactor
@@ -67,11 +67,10 @@ int Acceptor::OnEpollEvent(uint32_t events)
                 if (errno == EAGAIN) return 0;    // 当fd上所有connect请求都读完后, 返回
                 else
                 {
-                    ERROR("Acceptor accept error");
+                    ERROR("error: accept error");
                     return -1;
                 }
             }
-            ERROR("Acceptor new client connection");
             // 将clientFd封装为SocketSession, 放入Reactor, 在Reactor处delete
             auto socketSession = new SocketSession(inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port), clientFd);
             Reactor::GetInstance().AddHandler(socketSession);

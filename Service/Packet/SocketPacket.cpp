@@ -12,7 +12,6 @@ void SocketPacket::SetSocketPacket(const char* socketPacketStart, ssize_t socket
 ssize_t SocketPacket::Decode()
 {
     // 包长度小于包头长度, 继续接收
-
     if (socketPacketLen_ < sizeof(SocketPacketHead)) return 0;
     // 解析包头
     SocketPacketHead head;
@@ -33,7 +32,7 @@ ssize_t SocketPacket::Decode()
 
 std::pair<const char*, uint32_t> SocketPacket::GetRequestPacket()
 {
-    return {socketPacketStart_, requestPacketLen_};
+    return {requestPacketStart_, requestPacketLen_};
 }
 
 void SocketPacket::SetResponsePacket(const char* responseHeadStart, const char* responseDataStart, uint32_t responseDataLen)

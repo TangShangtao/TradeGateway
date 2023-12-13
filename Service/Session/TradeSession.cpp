@@ -18,7 +18,7 @@ TradeApiAdapter* TradeSession::LoadLib(const std::string& loginStr)
 
 int TradeSession::ProcessLoginReq(const LoginReq& req, uint32_t reqId)
 {
-    DEBUG("receive loginReq, DebugInfo: {}", req.DebugInfo());
+    INFO("receive loginReq, DebugInfo: {}", req.loginString);
     std::string loginStr = req.loginString;
     tradeApi_ = ServiceMap::GetInstance().GetTradeApi(loginStr);
     if (tradeApi_ == nullptr)

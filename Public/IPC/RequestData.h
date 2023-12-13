@@ -14,7 +14,7 @@ struct LoginReq
 {
     char            loginString[MAX_LOGINSTRING_LEN];
 
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return std::string(loginString);
     }
@@ -29,7 +29,7 @@ struct OrderInsertReq
     double          limitPrice;
     uint32_t        volume;
 
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return std::string(code) + "," 
              + std::string(orderRef) + ","
@@ -46,7 +46,7 @@ struct OrderCancelReq
     char            orderRef[MAX_ORDERREF_LEN];
     ExchangeType    exchange;
 
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return std::string(orderSysID) + "," 
              + std::string(orderRef) + ","
@@ -57,7 +57,7 @@ struct OrderCancelReq
 struct QryAssetReq
 {
 
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -66,7 +66,7 @@ struct QryAssetReq
 struct QryPositionReq
 {
 
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -75,7 +75,7 @@ struct QryPositionReq
 struct QryOrderReq
 {
 
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -84,7 +84,7 @@ struct QryOrderReq
 struct QryTradeReq
 {
     
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }

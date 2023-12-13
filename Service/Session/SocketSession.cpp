@@ -14,6 +14,7 @@ SocketSession::SocketSession(const std::string& clientIP, uint16_t port, uint16_
     events_ = EPOLLERR | EPOLLHUP | EPOLLIN | EPOLLOUT;
     clientAddr_ = clientIP + ":" + std::to_string(port);
     name_ = fmt::format("SocketSession clientAddr {}", clientAddr_);
+    INFO("New socket session create");
     
 }
 
@@ -21,6 +22,7 @@ SocketSession::~SocketSession()
 {
     auto& map = ServiceMap::GetInstance();
     map.RemoveThisSession(this);
+    INFO("socket session erase");
 }
 
 int SocketSession::OnEpollEvent(uint32_t events)
@@ -76,6 +78,7 @@ int SocketSession::OnEpollEvent(uint32_t events)
                 // 2.包未读完, 继续读取
                 else if (result == 0)
                 {
+                    INFO("continue read");
                     // std::cout << "continue read..." << std::endl;
                 }
                 // 3.解析出一个请求包
@@ -111,7 +114,7 @@ int SocketSession::OnEpollEvent(uint32_t events)
 
 int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t requestPacketLen)
 {
-    DEBUG("clientAddr {} Processing... {}", clientAddr_, std::string(requestPacketStart));
+    INFO("clientAddr {} Processing request packet", clientAddr_);
     
     RequestPacketHead head;
     memset(&head, 0, sizeof(RequestPacketHead));
@@ -124,7 +127,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqLogin:
             LoginReq loginReq;
             memcpy(&loginReq, requestDataStart, sizeof(LoginReq));
-            DEBUG("clientAddr {}, ReqLogin, info: {}", clientAddr_, req.DebugInfo());
+            INFO("clientAddr {}, ReqLogin, DebugInfo: {}", clientAddr_, loginReq.DebugInfo());
             ServiceMap::GetInstance().AddNewSession(loginReq.loginString, this);
             result = tradeSession_.ProcessLoginReq(loginReq, head.requestId);
             if (result != 0)
@@ -136,7 +139,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqOrderInsert:
             OrderInsertReq orderInsertReq;
             memcpy(&orderInsertReq, requestDataStart, sizeof(OrderInsertReq));
-            DEBUG("clientAddr {}, ReqOrderInsert, info: {}", clientAddr_, req.DebugInfo());
+            INFO("clientAddr {}, ReqOrderInsert, info: {}", clientAddr_, orderInsertReq.DebugInfo());
             result = tradeSession_.ProcessOrderInsertReq(orderInsertReq, head.requestId);
             if (result != 0)
             {
@@ -147,7 +150,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqOrderCancel:
             OrderCancelReq orderCancelReq;
             memcpy(&orderCancelReq, requestDataStart, sizeof(OrderCancelReq));
-            DEBUG("clientAddr {}, ReqOrderCancel, info: {}", clientAddr_, req.DebugInfo());
+            INFO("clientAddr {}, ReqOrderCancel, info: {}", clientAddr_, orderCancelReq.DebugInfo());
             result = tradeSession_.ProcessOrderCancelReq(orderCancelReq, head.requestId);
             if (result != 0)
             {
@@ -158,7 +161,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryAsset:
             QryAssetReq qryAssetReq;
             memcpy(&qryAssetReq, requestDataStart, sizeof(QryAssetReq));
-            DEBUG("clientAddr {}, ReqQryAsset, info: {}", clientAddr_, req.DebugInfo());
+            INFO("clientAddr {}, ReqQryAsset, info: {}", clientAddr_, qryAssetReq.DebugInfo());
             result = tradeSession_.ProcessQryAssetReq(qryAssetReq, head.requestId);
             if (result != 0)
             {
@@ -169,7 +172,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryPosition:
             QryPositionReq qryPositionReq;
             memcpy(&qryPositionReq, requestDataStart, sizeof(QryPositionReq));
-            DEBUG("clientAddr {}, ReqQryPosition, info: {}", clientAddr_, req.DebugInfo());
+            INFO("clientAddr {}, ReqQryPosition, info: {}", clientAddr_, qryPositionReq.DebugInfo());
             result = tradeSession_.ProcessQryPositionReq(qryPositionReq, head.requestId);
             if (result != 0)
             {
@@ -180,7 +183,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryOrder:
             QryOrderReq qryOrderReq;
             memcpy(&qryOrderReq, requestDataStart, sizeof(QryOrderReq));
-            DEBUG("clientAddr {}, ReqQryOrder, info: {}", clientAddr_, req.DebugInfo());
+            INFO("clientAddr {}, ReqQryOrder, info: {}", clientAddr_, qryOrderReq.DebugInfo());
             result = tradeSession_.ProcessQryOrderReq(qryOrderReq, head.requestId);
             if (result != 0)
             {
@@ -191,7 +194,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryTrade:
             QryTradeReq qryTradeReq;
             memcpy(&qryTradeReq, requestDataStart, sizeof(QryTradeReq));
-            DEBUG("clientAddr {}, ReqQryTrade, info: {}", clientAddr_, req.DebugInfo());
+            INFO("clientAddr {}, ReqQryTrade, info: {}", clientAddr_, qryTradeReq.DebugInfo());
             result = tradeSession_.ProcessQryTradeReq(qryTradeReq, head.requestId);
             if (result != 0)
             {
@@ -210,7 +213,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
 
 void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen)
 {
-    DEBUG("Processing response to clientAddr {}, ResponseType: {}", clientAddr_, type);
+    INFO("Processing response to clientAddr {}, ResponseType: {}", clientAddr_, type);
     // 构造业务回报数据包头
     ResponsePacketHead head;
     memset(&head, 0, sizeof(ResponsePacketHead));
@@ -238,6 +241,6 @@ void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& e
             sendLen += len;
         }
     } while (sendLen < sendEnd_);
-    DEBUG("Send response to clientAddr {}", clientAddr_);
+    INFO("Send response to clientAddr {}", clientAddr_);
     
 }

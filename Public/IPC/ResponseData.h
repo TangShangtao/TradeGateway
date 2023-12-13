@@ -6,7 +6,7 @@ namespace TradeGateway
 
 struct LoginRsp
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -14,7 +14,7 @@ struct LoginRsp
 
 struct OrderInsertRsp
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -22,7 +22,7 @@ struct OrderInsertRsp
 
 struct OrderCancelRsp
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -30,7 +30,7 @@ struct OrderCancelRsp
 
 struct QryAssetRsp
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -38,7 +38,7 @@ struct QryAssetRsp
 
 struct QryPositionRsp
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -46,7 +46,7 @@ struct QryPositionRsp
 
 struct QryOrderRsp
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -54,7 +54,7 @@ struct QryOrderRsp
 
 struct QryTradeRsp
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -62,7 +62,7 @@ struct QryTradeRsp
 
 struct OrderRtn
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }
@@ -70,7 +70,7 @@ struct OrderRtn
 
 struct TradeRtn
 {
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return "";
     }    

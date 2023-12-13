@@ -39,7 +39,7 @@ struct RequestPacketHead
 {
     RequestType   requestType;
     uint32_t requestId;
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return std::to_string((uint8_t)requestType) + ","
              + std::to_string(requestId);
@@ -69,7 +69,7 @@ struct ErrorMessage
 {
     uint8_t errorID;
     char message[MAX_ERRORMESSAGE_LEN];
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return std::to_string(errorID) + ","
              + std::string(message);
@@ -81,7 +81,7 @@ struct ResponsePacketHead
     ResponseType   responseType;
     ErrorMessage errorMessage;
     uint32_t requestId;
-    std::string DebugInfo()
+    std::string DebugInfo() const
     {
         return std::to_string((uint8_t)responseType) + ","
              + errorMessage.DebugInfo() + ","

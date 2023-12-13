@@ -1,5 +1,5 @@
 #include "TestApi.h"
-
+#include <cstring>
 
 TestApi::TestApi(const std::string& loginStr)
     : TradeApiAdapter(loginStr)
@@ -10,31 +10,36 @@ TestApi::~TestApi()
 {
     
 }
-void TestApi::ReqLogin(const LoginReq& req, uint32_t reqId)
+int TestApi::ReqLogin(const LoginReq& req, uint32_t reqId)
 {
-    
+    ErrorMessage msg{0};
+    msg.errorID = 111;
+    strncpy(msg.message, "aabbcc", sizeof(msg.message) - 1);
+    LoginRsp rsp;
+    handler_.RspLogin(msg, rsp, reqId);
+    return 0;
 }
-void TestApi::ReqOrderInsert(const OrderInsertReq& req, uint32_t reqId)
+int TestApi::ReqOrderInsert(const OrderInsertReq& req, uint32_t reqId)
 {
-    
+    return 0;
 }
-void TestApi::ReqOrderCancel(const OrderCancelReq& req, uint32_t reqId)
+int TestApi::ReqOrderCancel(const OrderCancelReq& req, uint32_t reqId)
 {
-    
+    return 0;
 }
-void TestApi::ReqQryAsset(const QryAssetReq& req, uint32_t reqId)
+int TestApi::ReqQryAsset(const QryAssetReq& req, uint32_t reqId)
 {
-    
+    return 0;
 }
-void TestApi::ReqQryPosition(const QryPositionReq& req, uint32_t reqId)
+int TestApi::ReqQryPosition(const QryPositionReq& req, uint32_t reqId)
 {
-    
+    return 0; 
 }
-void TestApi::ReqQryOrder(const QryOrderReq& req, uint32_t reqId)
+int TestApi::ReqQryOrder(const QryOrderReq& req, uint32_t reqId)
 {
-    
+    return 0;
 }
-void TestApi::ReqQryTrade(const QryTradeReq& req, uint32_t reqId)
+int TestApi::ReqQryTrade(const QryTradeReq& req, uint32_t reqId)
 {
-    
+    return 0;
 }

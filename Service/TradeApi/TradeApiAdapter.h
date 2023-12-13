@@ -11,15 +11,15 @@ class TradeApiAdapter
 {
 public:
     explicit TradeApiAdapter(const std::string& loginStr);
-    virtual ~TradeApiAdapter() = 0;
+    virtual ~TradeApiAdapter() = default;
 
-    virtual void ReqLogin(const LoginReq& req, uint32_t reqId) = 0;
-    virtual void ReqOrderInsert(const OrderInsertReq& req, uint32_t reqId) = 0;
-    virtual void ReqOrderCancel(const OrderCancelReq& req, uint32_t reqId) = 0;
-    virtual void ReqQryAsset(const QryAssetReq& req, uint32_t reqId) = 0;
-    virtual void ReqQryPosition(const QryPositionReq& req, uint32_t reqId) = 0;
-    virtual void ReqQryOrder(const QryOrderReq& req, uint32_t reqId) = 0;
-    virtual void ReqQryTrade(const QryTradeReq& req, uint32_t reqId) = 0;
+    virtual int ReqLogin(const LoginReq& req, uint32_t reqId) = 0;
+    virtual int ReqOrderInsert(const OrderInsertReq& req, uint32_t reqId) = 0;
+    virtual int ReqOrderCancel(const OrderCancelReq& req, uint32_t reqId) = 0;
+    virtual int ReqQryAsset(const QryAssetReq& req, uint32_t reqId) = 0;
+    virtual int ReqQryPosition(const QryPositionReq& req, uint32_t reqId) = 0;
+    virtual int ReqQryOrder(const QryOrderReq& req, uint32_t reqId) = 0;
+    virtual int ReqQryTrade(const QryTradeReq& req, uint32_t reqId) = 0;
 
 protected:
     TradeApiHandler handler_;

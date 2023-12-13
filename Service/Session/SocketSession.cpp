@@ -1,5 +1,6 @@
 #include "SocketSession.h"
 #include "Logger.h"
+#include "../ServiceMap/ServiceMap.h"
 
 #include <iostream>
 #include <sys/socket.h>
@@ -13,9 +14,14 @@ SocketSession::SocketSession(const std::string& clientIP, uint16_t port, uint16_
     events_ = EPOLLERR | EPOLLHUP | EPOLLIN | EPOLLOUT;
     clientAddr_ = clientIP + ":" + std::to_string(port);
     name_ = fmt::format("SocketSession clientAddr {}", clientAddr_);
+    
 }
 
-SocketSession::~SocketSession() = default;
+SocketSession::~SocketSession()
+{
+    auto& map = ServiceMap::GetInstance();
+    map.RemoveThisSession(this);
+}
 
 int SocketSession::OnEpollEvent(uint32_t events)
 {
@@ -64,7 +70,7 @@ int SocketSession::OnEpollEvent(uint32_t events)
                 // 1.包不合法, 断开连接
                 if (result == -1)
                 {
-                    ERROR("clientAddr {} invalid SocketPacket error", clientAddr_);
+                    ERROR("error: clientAddr {} invalid SocketPacket", clientAddr_);
                     recvStart_ = recvEnd_;
                 }
                 // 2.包未读完, 继续读取
@@ -77,7 +83,12 @@ int SocketSession::OnEpollEvent(uint32_t events)
                 {
                     recvStart_ += result;
                     auto requestPacket = packet.GetRequestPacket();
-                    ProcessRequestPacket(requestPacket.first, requestPacket.second);
+                    int processResult = ProcessRequestPacket(requestPacket.first, requestPacket.second);
+                    if (processResult != 0)
+                    {
+                        ERROR("error: clientAddr {} process requestPacket failed, result: {}", clientAddr_, processResult);
+                        return -1;
+                    }
                 }
             } while (result > 0 && recvEnd_ - recvStart_ > 0);
 
@@ -98,7 +109,7 @@ int SocketSession::OnEpollEvent(uint32_t events)
     }
 }
 
-void SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t requestPacketLen)
+int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t requestPacketLen)
 {
     DEBUG("clientAddr {} Processing... {}", clientAddr_, std::string(requestPacketStart));
     
@@ -107,51 +118,99 @@ void SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_
     // 直接强转, 解析业务请求数据包头
     memcpy(&head, requestPacketStart, sizeof(RequestPacketHead));
     const char* requestDataStart = requestPacketStart + sizeof(RequestPacketHead);
+    int result = 0;
     switch (head.requestType)
     {
         case RequestType::ReqLogin:
             LoginReq loginReq;
             memcpy(&loginReq, requestDataStart, sizeof(LoginReq));
             DEBUG("clientAddr {}, ReqLogin, info: {}", clientAddr_, req.DebugInfo());
-            // TODO
+            ServiceMap::GetInstance().AddNewSession(loginReq.loginString, this);
+            result = tradeSession_.ProcessLoginReq(loginReq, head.requestId);
+            if (result != 0)
+            {
+                ERROR("error: ProcessLoginReq failed, loginStr: {}", loginReq.loginString);
+                return -1;
+            }
+            return 0;
         case RequestType::ReqOrderInsert:
             OrderInsertReq orderInsertReq;
             memcpy(&orderInsertReq, requestDataStart, sizeof(OrderInsertReq));
             DEBUG("clientAddr {}, ReqOrderInsert, info: {}", clientAddr_, req.DebugInfo());
-
+            result = tradeSession_.ProcessOrderInsertReq(orderInsertReq, head.requestId);
+            if (result != 0)
+            {
+                ERROR("error: ProcessOrderInsertReq failed, loginStr: {}", loginReq.loginString);
+                return -1;
+            }
+            return 0;
         case RequestType::ReqOrderCancel:
             OrderCancelReq orderCancelReq;
             memcpy(&orderCancelReq, requestDataStart, sizeof(OrderCancelReq));
             DEBUG("clientAddr {}, ReqOrderCancel, info: {}", clientAddr_, req.DebugInfo());
-
+            result = tradeSession_.ProcessOrderCancelReq(orderCancelReq, head.requestId);
+            if (result != 0)
+            {
+                ERROR("error: ProcessOrderCancelReq failed, loginStr: {}", loginReq.loginString);
+                return -1;
+            }
+            return 0;
         case RequestType::ReqQryAsset:
             QryAssetReq qryAssetReq;
             memcpy(&qryAssetReq, requestDataStart, sizeof(QryAssetReq));
             DEBUG("clientAddr {}, ReqQryAsset, info: {}", clientAddr_, req.DebugInfo());
-
+            result = tradeSession_.ProcessQryAssetReq(qryAssetReq, head.requestId);
+            if (result != 0)
+            {
+                ERROR("error: ProcessQryAssetReq failed, loginStr: {}", loginReq.loginString);
+                return -1;
+            }
+            return 0;
         case RequestType::ReqQryPosition:
             QryPositionReq qryPositionReq;
             memcpy(&qryPositionReq, requestDataStart, sizeof(QryPositionReq));
             DEBUG("clientAddr {}, ReqQryPosition, info: {}", clientAddr_, req.DebugInfo());
-
+            result = tradeSession_.ProcessQryPositionReq(qryPositionReq, head.requestId);
+            if (result != 0)
+            {
+                ERROR("error: ProcessQryPositionReq failed, loginStr: {}", loginReq.loginString);
+                return -1;
+            }
+            return 0;
         case RequestType::ReqQryOrder:
             QryOrderReq qryOrderReq;
             memcpy(&qryOrderReq, requestDataStart, sizeof(QryOrderReq));
             DEBUG("clientAddr {}, ReqQryOrder, info: {}", clientAddr_, req.DebugInfo());
-
+            result = tradeSession_.ProcessQryOrderReq(qryOrderReq, head.requestId);
+            if (result != 0)
+            {
+                ERROR("error: ProcessQryOrderReq failed, loginStr: {}", loginReq.loginString);
+                return -1;
+            }
+            return 0;
         case RequestType::ReqQryTrade:
             QryTradeReq qryTradeReq;
             memcpy(&qryTradeReq, requestDataStart, sizeof(QryTradeReq));
             DEBUG("clientAddr {}, ReqQryTrade, info: {}", clientAddr_, req.DebugInfo());
-
+            result = tradeSession_.ProcessQryTradeReq(qryTradeReq, head.requestId);
+            if (result != 0)
+            {
+                ERROR("error: ProcessQryTradeReq failed, loginStr: {}", loginReq.loginString);
+                return -1;
+            }
+            return 0;
         case RequestType::None:
             ERROR("clientAddr {}, requestType parse error", clientAddr_);
+            return -1;
+        default:
+            ERROR("clientAddr {}, requestType parse error", clientAddr_);
+            return -1;
     }
 }
 
 void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen)
 {
-    DEBUG("Processing response to clientAddr {}, response: {}", clientAddr_, std::string(responsePacketStart));
+    DEBUG("Processing response to clientAddr {}, ResponseType: {}", clientAddr_, type);
     // 构造业务回报数据包头
     ResponsePacketHead head;
     memset(&head, 0, sizeof(ResponsePacketHead));
@@ -159,10 +218,10 @@ void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& e
     head.errorMessage = errorMessage;
     head.requestId = reqId;
     SocketPacket packet;
-    packet.SetResponsePacket(responseDataStart, responseDataLen, (char*)&head);
+    packet.SetResponsePacket((char*)&head, responseDataStart, responseDataLen);
 
-    auto packeLen = packet.Encode(sendBuf_ + sendEnd_, MAX_BUF - sendEnd_);
-    sendEnd_ += packeLen;
+    auto packetLen = packet.Encode(sendBuf_ + sendEnd_, MAX_BUF - sendEnd_);
+    sendEnd_ += packetLen;
     
     size_t sendLen = 0;
     ssize_t len = 0;

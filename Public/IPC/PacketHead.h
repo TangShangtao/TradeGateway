@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <string>
 #include "../DataStructure/Constexpr.h"
 
 
@@ -38,6 +39,11 @@ struct RequestPacketHead
 {
     RequestType   requestType;
     uint32_t requestId;
+    std::string DebugInfo()
+    {
+        return std::to_string((uint8_t)requestType) + ","
+             + std::to_string(requestId);
+    }
 };
 
 /**
@@ -63,6 +69,11 @@ struct ErrorMessage
 {
     uint8_t errorID;
     char message[MAX_ERRORMESSAGE_LEN];
+    std::string DebugInfo()
+    {
+        return std::to_string(errorID) + ","
+             + std::string(message);
+    }
 };
 
 struct ResponsePacketHead
@@ -70,7 +81,12 @@ struct ResponsePacketHead
     ResponseType   responseType;
     ErrorMessage errorMessage;
     uint32_t requestId;
-
+    std::string DebugInfo()
+    {
+        return std::to_string((uint8_t)responseType) + ","
+             + errorMessage.DebugInfo() + ","
+             + std::to_string(requestId);
+    }
 };
 
 };

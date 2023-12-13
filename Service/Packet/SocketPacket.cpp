@@ -36,9 +36,10 @@ std::pair<const char*, uint32_t> SocketPacket::GetRequestPacket()
     return {socketPacketStart_, requestPacketLen_};
 }
 
-void SocketPacket::SetResponsePacket(const char* responseDataStart, uint32_t responseDataLen, const char* responseHeadStart)
+void SocketPacket::SetResponsePacket(const char* responseHeadStart, const char* responseDataStart, uint32_t responseDataLen)
 {
-    responseHeadStart_ = responseDataStart;
+    responseHeadStart_ = responseHeadStart;
+
     responseDataStart_ = responseDataStart;
     responseDataLen_ = responseDataLen;
 }

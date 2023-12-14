@@ -6,7 +6,11 @@ namespace TradeGateway
 
 struct LoginRsp
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -14,7 +18,11 @@ struct LoginRsp
 
 struct OrderInsertRsp
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -22,7 +30,11 @@ struct OrderInsertRsp
 
 struct OrderCancelRsp
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -30,7 +42,11 @@ struct OrderCancelRsp
 
 struct QryAssetRsp
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -38,7 +54,11 @@ struct QryAssetRsp
 
 struct QryPositionRsp
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -46,7 +66,11 @@ struct QryPositionRsp
 
 struct QryOrderRsp
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -54,7 +78,11 @@ struct QryOrderRsp
 
 struct QryTradeRsp
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -62,7 +90,11 @@ struct QryTradeRsp
 
 struct OrderRtn
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }
@@ -70,7 +102,11 @@ struct OrderRtn
 
 struct TradeRtn
 {
+<<<<<<< HEAD
     std::string DebugInfo() const
+=======
+    std::string DebugInfo()
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return "";
     }    

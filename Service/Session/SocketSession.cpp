@@ -14,7 +14,10 @@ SocketSession::SocketSession(const std::string& clientIP, uint16_t port, uint16_
     events_ = EPOLLERR | EPOLLHUP | EPOLLIN | EPOLLOUT | EPOLLET;
     clientAddr_ = clientIP + ":" + std::to_string(port);
     name_ = fmt::format("SocketSession clientAddr {}", clientAddr_);
+<<<<<<< HEAD
     INFO("New socket session create");
+=======
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     
 }
 
@@ -22,7 +25,10 @@ SocketSession::~SocketSession()
 {
     auto& map = ServiceMap::GetInstance();
     map.RemoveThisSession(this);
+<<<<<<< HEAD
     INFO("socket session erase");
+=======
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
 }
 
 int SocketSession::OnEpollEvent(uint32_t events)
@@ -133,7 +139,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqLogin:
             LoginReq loginReq;
             memcpy(&loginReq, requestDataStart, sizeof(LoginReq));
+<<<<<<< HEAD
             INFO("clientAddr {}, ReqLogin, DebugInfo: {}", clientAddr_, loginReq.DebugInfo());
+=======
+            DEBUG("clientAddr {}, ReqLogin, info: {}", clientAddr_, req.DebugInfo());
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             ServiceMap::GetInstance().AddNewSession(loginReq.loginString, this);
             result = tradeSession_.ProcessLoginReq(loginReq, head.requestId);
             if (result != 0)
@@ -145,7 +155,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqOrderInsert:
             OrderInsertReq orderInsertReq;
             memcpy(&orderInsertReq, requestDataStart, sizeof(OrderInsertReq));
+<<<<<<< HEAD
             INFO("clientAddr {}, ReqOrderInsert, info: {}", clientAddr_, orderInsertReq.DebugInfo());
+=======
+            DEBUG("clientAddr {}, ReqOrderInsert, info: {}", clientAddr_, req.DebugInfo());
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             result = tradeSession_.ProcessOrderInsertReq(orderInsertReq, head.requestId);
             if (result != 0)
             {
@@ -156,7 +170,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqOrderCancel:
             OrderCancelReq orderCancelReq;
             memcpy(&orderCancelReq, requestDataStart, sizeof(OrderCancelReq));
+<<<<<<< HEAD
             INFO("clientAddr {}, ReqOrderCancel, info: {}", clientAddr_, orderCancelReq.DebugInfo());
+=======
+            DEBUG("clientAddr {}, ReqOrderCancel, info: {}", clientAddr_, req.DebugInfo());
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             result = tradeSession_.ProcessOrderCancelReq(orderCancelReq, head.requestId);
             if (result != 0)
             {
@@ -167,7 +185,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryAsset:
             QryAssetReq qryAssetReq;
             memcpy(&qryAssetReq, requestDataStart, sizeof(QryAssetReq));
+<<<<<<< HEAD
             INFO("clientAddr {}, ReqQryAsset, info: {}", clientAddr_, qryAssetReq.DebugInfo());
+=======
+            DEBUG("clientAddr {}, ReqQryAsset, info: {}", clientAddr_, req.DebugInfo());
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             result = tradeSession_.ProcessQryAssetReq(qryAssetReq, head.requestId);
             if (result != 0)
             {
@@ -178,7 +200,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryPosition:
             QryPositionReq qryPositionReq;
             memcpy(&qryPositionReq, requestDataStart, sizeof(QryPositionReq));
+<<<<<<< HEAD
             INFO("clientAddr {}, ReqQryPosition, info: {}", clientAddr_, qryPositionReq.DebugInfo());
+=======
+            DEBUG("clientAddr {}, ReqQryPosition, info: {}", clientAddr_, req.DebugInfo());
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             result = tradeSession_.ProcessQryPositionReq(qryPositionReq, head.requestId);
             if (result != 0)
             {
@@ -189,7 +215,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryOrder:
             QryOrderReq qryOrderReq;
             memcpy(&qryOrderReq, requestDataStart, sizeof(QryOrderReq));
+<<<<<<< HEAD
             INFO("clientAddr {}, ReqQryOrder, info: {}", clientAddr_, qryOrderReq.DebugInfo());
+=======
+            DEBUG("clientAddr {}, ReqQryOrder, info: {}", clientAddr_, req.DebugInfo());
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             result = tradeSession_.ProcessQryOrderReq(qryOrderReq, head.requestId);
             if (result != 0)
             {
@@ -200,7 +230,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
         case RequestType::ReqQryTrade:
             QryTradeReq qryTradeReq;
             memcpy(&qryTradeReq, requestDataStart, sizeof(QryTradeReq));
+<<<<<<< HEAD
             INFO("clientAddr {}, ReqQryTrade, info: {}", clientAddr_, qryTradeReq.DebugInfo());
+=======
+            DEBUG("clientAddr {}, ReqQryTrade, info: {}", clientAddr_, req.DebugInfo());
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             result = tradeSession_.ProcessQryTradeReq(qryTradeReq, head.requestId);
             if (result != 0)
             {
@@ -219,7 +253,11 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
 
 void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen)
 {
+<<<<<<< HEAD
     INFO("Processing response to clientAddr {}, ResponseType: {}", clientAddr_, type);
+=======
+    DEBUG("Processing response to clientAddr {}, ResponseType: {}", clientAddr_, type);
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     // 构造业务回报数据包头
     ResponsePacketHead head;
     memset(&head, 0, sizeof(ResponsePacketHead));
@@ -228,6 +266,7 @@ void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& e
     head.requestId = reqId;
     SocketPacket packet;
     packet.SetResponsePacket((char*)&head, responseDataStart, responseDataLen);
+<<<<<<< HEAD
     auto packetLen = packet.Encode(sendBuf_ + sendEnd_, MAX_BUF - sendEnd_);
     sendEnd_ += packetLen;
 
@@ -236,6 +275,11 @@ void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& e
     {
         ERROR("error: SocketSession SendResponse failed");
     }
+=======
+
+    auto packetLen = packet.Encode(sendBuf_ + sendEnd_, MAX_BUF - sendEnd_);
+    sendEnd_ += packetLen;
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     
 }
 

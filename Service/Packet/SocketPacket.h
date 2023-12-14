@@ -21,11 +21,16 @@ public:
     // 对readBuf处的socket数据包进行解包, 解包出请求数据包
     // 返回值: 业务请求数据包指针起始、包长
     std::pair<const char*, uint32_t> GetRequestPacket();
+<<<<<<< HEAD
 
     // 对回报数据包进行封包，封装出socket数据包, 拷贝至sendBuf处
     void SetResponsePacket(const char* responseHeadStart, const char* responseDataStart, uint32_t responseDataLen);
     // 对回报数据包进行封包，封装出socket数据包, 拷贝至sendBuf处
     // 返回值: 该socket数据包完整长度
+=======
+    //  对回报数据包进行封包，封装出socket数据包, 拷贝至sendBuf处
+    void SetResponsePacket(const char* responseHeadStart, const char* responseDataStart, uint32_t responseDataLen);
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     ssize_t Encode(char* socketPacketStart, size_t socketPacketLen);
 
 private:

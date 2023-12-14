@@ -4,7 +4,11 @@
 void ServiceMap::AddNewSession(const std::string& loginStr, SocketSession* session)
 {
     loginStr2SocketSession_[loginStr].insert(session);
+<<<<<<< HEAD
     INFO("Add new session, loginStr: {}", loginStr);
+=======
+    DEBUG("loginStr {} has new session", loginStr);
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
 }
 
 void ServiceMap::RemoveThisSession(SocketSession* session)
@@ -14,11 +18,19 @@ void ServiceMap::RemoveThisSession(SocketSession* session)
         if (it->second.count(session) != 1) continue;
 
         it->second.erase(session);
+<<<<<<< HEAD
         INFO("Remove socket session from map");
         if (it->second.size() == 0)
         {
             std::string loginStr = it->first;
             INFO("No session remain, delete loginStr: {}", loginStr);
+=======
+        DEBUG("remove socket session from map");
+        if (it->second.size() == 0)
+        {
+            std::string loginStr = it->first;
+            DEBUG("loginStr {} has no session, delete", loginStr);
+>>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             delete loginStr2TradeApi_[loginStr];
             loginStr2TradeApi_.erase(loginStr);
         }

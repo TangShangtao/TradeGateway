@@ -15,10 +15,17 @@ public:
 
     // 对readBuf处的socket数据包进行解包, 解包出请求数据包
     void SetSocketPacket(const char* socketPacketStart, ssize_t socketPacketLen);
+    // 对readBuf处的socket数据包进行解包, 解包出请求数据包
+    // 返回值: -1: 包不合法, 0: 包未接收完整, len: 该socket数据包完整长度
     ssize_t Decode();
+    // 对readBuf处的socket数据包进行解包, 解包出请求数据包
+    // 返回值: 业务请求数据包指针起始、包长
     std::pair<const char*, uint32_t> GetRequestPacket();
-    //  对回报数据包进行封包，封装出socket数据包, 拷贝至sendBuf处
+
+    // 对回报数据包进行封包，封装出socket数据包, 拷贝至sendBuf处
     void SetResponsePacket(const char* responseHeadStart, const char* responseDataStart, uint32_t responseDataLen);
+    // 对回报数据包进行封包，封装出socket数据包, 拷贝至sendBuf处
+    // 返回值: 该socket数据包完整长度
     ssize_t Encode(char* socketPacketStart, size_t socketPacketLen);
 
 private:

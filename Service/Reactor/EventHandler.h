@@ -17,8 +17,10 @@ public:
     virtual ~EventHandler() = 0;
     int GetFd() const;
     uint32_t GetEvents() const;
+public:
+    std::string name_;              // 名称
 protected:
     int fd_;                        // 目标fd(子类在构造函数中指定)
     uint32_t events_;               // 订阅的epoll事件(子类在构造函数中指定)
-    std::string name_;              // 名称
+    
 };

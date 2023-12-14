@@ -24,6 +24,7 @@ private:
     // response回报数据进行封包, 得到回报数据包，发送给客户端
     friend class ServiceMap;
     void ProcessResponseData(ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen);
+    int SendResponse();
 private:
     std::string clientAddr_;
 

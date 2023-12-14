@@ -11,7 +11,7 @@
 SocketSession::SocketSession(const std::string& clientIP, uint16_t port, uint16_t clientFd)
 {
     fd_ = clientFd;
-    events_ = EPOLLERR | EPOLLHUP | EPOLLIN | EPOLLOUT;
+    events_ = EPOLLERR | EPOLLHUP | EPOLLIN | EPOLLOUT | EPOLLET;
     clientAddr_ = clientIP + ":" + std::to_string(port);
     name_ = fmt::format("SocketSession clientAddr {}", clientAddr_);
     INFO("New socket session create");
@@ -103,6 +103,12 @@ int SocketSession::OnEpollEvent(uint32_t events)
     }
     if (events & EPOLLOUT)
     {
+        int result = SendResponse();
+        if (result != 0)
+        {
+            ERROR("SendResponse error");
+            return result;
+        }
         return 0;
     }
     else
@@ -222,25 +228,51 @@ void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& e
     head.requestId = reqId;
     SocketPacket packet;
     packet.SetResponsePacket((char*)&head, responseDataStart, responseDataLen);
-
     auto packetLen = packet.Encode(sendBuf_ + sendEnd_, MAX_BUF - sendEnd_);
     sendEnd_ += packetLen;
+
+    int result = SendResponse();
+    if (result != 0)
+    {
+        ERROR("error: SocketSession SendResponse failed");
+    }
     
-    size_t sendLen = 0;
+}
+
+int SocketSession::SendResponse()
+{
+    if (sendEnd_ == 0) return 0;
+    int result = 0;
+    size_t sendLen = 0;     // 已发送长度
     ssize_t len = 0;
     do
     {
         len = send(fd_, sendBuf_ + sendLen, sendEnd_ - sendLen, 0);
         if (len <= 0)
         {
-            ERROR("client {} send ret {} errno {} err msg {} sendLen:{}", clientAddr_, len, errno, strerror(errno), sendLen);
-            break;
+            if (errno == EAGAIN) break;
+            else
+            {
+                ERROR("clientAddr {} send len == -1 error", clientAddr_);
+                result = -1;
+                break;
+            }
         }
         else
         {
             sendLen += len;
         }
     } while (sendLen < sendEnd_);
+    // do while顺利完成, sendBuf全部发送
+    if (sendLen == sendEnd_) sendEnd_ = 0;
+    // send函数返回负数, 将sendBuf剩余字节拷贝至开头
+    else if (sendLen < sendEnd_)
+    {   
+        memmove(sendBuf_, sendBuf_ + sendLen, sendEnd_ - sendLen);
+        sendEnd_ -= sendLen;
+        ERROR("copy remain sendBuf");
+    }
+    else ERROR("sendLen > sendEnd_");
     INFO("Send response to clientAddr {}", clientAddr_);
-    
+    return result;
 }

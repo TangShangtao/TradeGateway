@@ -36,6 +36,8 @@ void Reactor::AddHandler(EventHandler* handler)
 
 void Reactor::Run(bool isBusyWait)
 {
+    std::cout << "Reactor start running ..." << std::endl;
+    INFO("Reactor start running ...");
     struct epoll_event epollEvents[MAX_EVENT];
     while (true)
     {
@@ -51,7 +53,7 @@ void Reactor::Run(bool isBusyWait)
                 int ret = handler->OnEpollEvent(epollEvent.events);
                 if (ret == -1) 
                 {
-                    INFO("delete handler");
+                    INFO("delete handler {}", handler->name_);
                     delete handler;
                 }
             }

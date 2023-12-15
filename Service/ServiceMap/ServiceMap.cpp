@@ -1,14 +1,11 @@
 #include "ServiceMap.h"
 #include "Logger.h"
 
+uint32_t ServiceMap::gatewayReqId_ = 0;
 void ServiceMap::AddNewSession(const std::string& loginStr, SocketSession* session)
 {
     loginStr2SocketSession_[loginStr].insert(session);
-<<<<<<< HEAD
     INFO("Add new session, loginStr: {}", loginStr);
-=======
-    DEBUG("loginStr {} has new session", loginStr);
->>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
 }
 
 void ServiceMap::RemoveThisSession(SocketSession* session)
@@ -18,19 +15,11 @@ void ServiceMap::RemoveThisSession(SocketSession* session)
         if (it->second.count(session) != 1) continue;
 
         it->second.erase(session);
-<<<<<<< HEAD
         INFO("Remove socket session from map");
         if (it->second.size() == 0)
         {
             std::string loginStr = it->first;
             INFO("No session remain, delete loginStr: {}", loginStr);
-=======
-        DEBUG("remove socket session from map");
-        if (it->second.size() == 0)
-        {
-            std::string loginStr = it->first;
-            DEBUG("loginStr {} has no session, delete", loginStr);
->>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
             delete loginStr2TradeApi_[loginStr];
             loginStr2TradeApi_.erase(loginStr);
         }
@@ -56,11 +45,36 @@ void ServiceMap::AddTradeApi(const std::string& loginStr, TradeApiAdapter* trade
     loginStr2TradeApi_[loginStr] = tradeApi;
 }
 
-void ServiceMap::PushAllSession(std::string& loginStr, ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen)
+void ServiceMap::PushAllSession(std::string& loginStr, ResponseType type, const ErrorMessage& errorMessage, char* responseDataStart, uint32_t responseDataLen)
 {
     auto& sessions = loginStr2SocketSession_[loginStr];
     for (SocketSession* session : sessions)
     {
-        session->ProcessResponseData(type, errorMessage, reqId, responseDataStart, responseDataLen);
+        session->ProcessResponseData(type, errorMessage, 0, responseDataStart, responseDataLen);
     }
+}
+
+void ServiceMap::PushOneSession(uint32_t gatewayReqId, ResponseType type, const ErrorMessage& errorMessage, char* responseDataStart, uint32_t responseDataLen)
+{
+    if (gatewayReqId2SessionReq_.count(gatewayReqId) == 0)
+    {
+        ERROR("error: gatewayReqId not found in map, gatewayReqId {}, ResponseType {}", gatewayReqId, type);
+        return;
+    }
+    auto sessionReq = gatewayReqId2SessionReq_[gatewayReqId];
+    uint32_t sessionReqId = sessionReq.first;
+    SocketSession* session = sessionReq.second;
+    session->ProcessResponseData(type, errorMessage, sessionReqId, responseDataStart, responseDataLen);
+
+}
+
+uint32_t ServiceMap::AddNewReq(uint32_t sessionReqId, SocketSession* session)
+{
+    gatewayReqId2SessionReq_[++gatewayReqId_] = {sessionReqId, session};
+    return gatewayReqId_;
+}
+
+void ServiceMap::RemoveReq(uint32_t gatewayReqId)
+{
+    gatewayReqId2SessionReq_.erase(gatewayReqId);
 }

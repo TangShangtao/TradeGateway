@@ -39,11 +39,7 @@ struct RequestPacketHead
 {
     RequestType   requestType;
     uint32_t requestId;
-<<<<<<< HEAD
     std::string DebugInfo() const
-=======
-    std::string DebugInfo()
->>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return std::to_string((uint8_t)requestType) + ","
              + std::to_string(requestId);
@@ -73,11 +69,7 @@ struct ErrorMessage
 {
     uint8_t errorID;
     char message[MAX_ERRORMESSAGE_LEN];
-<<<<<<< HEAD
     std::string DebugInfo() const
-=======
-    std::string DebugInfo()
->>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return std::to_string(errorID) + ","
              + std::string(message);
@@ -88,12 +80,8 @@ struct ResponsePacketHead
 {
     ResponseType   responseType;
     ErrorMessage errorMessage;
-    uint32_t requestId;
-<<<<<<< HEAD
+    uint32_t requestId;                 // 推送成交、订单状态回报时, requestId为0
     std::string DebugInfo() const
-=======
-    std::string DebugInfo()
->>>>>>> d23a801dd2219c996fa3c08a1a397f61399093de
     {
         return std::to_string((uint8_t)responseType) + ","
              + errorMessage.DebugInfo() + ","

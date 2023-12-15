@@ -47,7 +47,7 @@ ssize_t SocketPacket::Encode(char* socketPacketStart, size_t socketPacketLen)
 {
     if (socketPacketLen <  responseDataLen_ + sizeof(ResponsePacketHead))
     {
-        ERROR("socket packet encode error, send buf empty");
+        ERROR("error: socket packet encode error, send buf empty");
         return 0;
     }
     SocketPacketHead head;

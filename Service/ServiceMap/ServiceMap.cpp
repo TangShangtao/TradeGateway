@@ -58,7 +58,7 @@ void ServiceMap::PushOneSession(uint32_t gatewayReqId, ResponseType type, const 
 {
     if (gatewayReqId2SessionReq_.count(gatewayReqId) == 0)
     {
-        ERROR("error: gatewayReqId not found in map, gatewayReqId {}, ResponseType {}", gatewayReqId, type);
+        ERROR("error: gatewayReqId not found in map, gatewayReqId {}", gatewayReqId);
         return;
     }
     auto sessionReq = gatewayReqId2SessionReq_[gatewayReqId];

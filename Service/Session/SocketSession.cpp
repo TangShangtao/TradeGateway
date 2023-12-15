@@ -234,7 +234,7 @@ int SocketSession::ProcessRequestPacket(const char* requestPacketStart, uint32_t
 
 void SocketSession::ProcessResponseData(ResponseType type, const ErrorMessage& errorMessage, uint32_t reqId, char* responseDataStart, uint32_t responseDataLen)
 {
-    INFO("Processing response to clientAddr {}, ResponseType: {}", clientAddr_, type);
+    INFO("Processing response to clientAddr {}", clientAddr_);
     // 构造业务回报数据包头
     ResponsePacketHead head;
     memset(&head, 0, sizeof(ResponsePacketHead));

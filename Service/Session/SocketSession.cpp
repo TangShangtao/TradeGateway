@@ -73,13 +73,13 @@ int SocketSession::OnEpollEvent(uint32_t events)
                 if (result == -1)
                 {
                     ERROR("error: clientAddr {} invalid SocketPacket", clientAddr_);
-                    recvStart_ = recvEnd_;
+                    return -1;
                 }
                 // 2.包未读完, 继续读取
                 else if (result == 0)
                 {
                     INFO("continue read");
-                    // std::cout << "continue read..." << std::endl;
+                    return 0;
                 }
                 // 3.解析出一个请求包
                 else
@@ -93,11 +93,11 @@ int SocketSession::OnEpollEvent(uint32_t events)
                         return -1;
                     }
                 }
-            } while (result > 0 && recvEnd_ - recvStart_ > 0);
+            } while (recvEnd_ - recvStart_ > 0);
 
-            memcpy(recvBuf_, recvBuf_ + recvStart_, recvEnd_ - recvStart_);
-            recvEnd_ -= recvStart_;
-            recvStart_ = 0;
+            // memcpy(recvBuf_, recvBuf_ + recvStart_, recvEnd_ - recvStart_);
+            // recvEnd_ -= recvStart_;
+            // recvStart_ = 0;
             // 从这里继续调用read读取
         }
     }

@@ -45,24 +45,26 @@ int TradeSession::ProcessLoginReq(const LoginReq& req, uint32_t gatewayReqId)
     {
         INFO("new loginStr received, load new tradeApi");
         tradeApi_ = LoadTradeApi(loginStr);
-    }
-    if (tradeApi_ == nullptr)
-    {
-        ERROR("error: load new tradeApi failed, loginStr: {}", req.loginString);
-        return -1;
-    }
-    else 
-    {
-        ServiceMap::GetInstance().AddTradeApi(loginStr, tradeApi_);
-        int result = tradeApi_->ReqLogin(req, gatewayReqId);
-        if (result != 0)
+        if (tradeApi_ == nullptr)
         {
-            ERROR("error: ReqLogin failed, result: {}", result);
+            ERROR("error: load new tradeApi failed, loginStr: {}", req.loginString);
+            return -1;
         }
-        return result;
+        else 
+        {
+            ServiceMap::GetInstance().AddTradeApi(loginStr, tradeApi_);
+        }
     }
-
-
+    else
+    {
+        INFO("same loginStr found in map, use old tradeApi");
+    }
+    int result = tradeApi_->ReqLogin(req, gatewayReqId);
+    if (result != 0)
+    {
+        ERROR("error: ReqLogin failed, result: {}", result);
+    }
+    return result;
 }
 int TradeSession::ProcessOrderInsertReq(const OrderInsertReq& req, uint32_t gatewayReqId)
 {

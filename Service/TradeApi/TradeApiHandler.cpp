@@ -12,7 +12,6 @@ void TradeApiHandler::RspLogin(const ErrorMessage& msg, const LoginRsp& rsp, uin
 {
     INFO("RspLogin : {}, {}, {}, loginStr: {}", msg.DebugInfo(), rsp.DebugInfo(), gatewayReqId, loginStr_);
     ServiceMap::GetInstance().PushOneSession(gatewayReqId, ResponseType::RspLogin, msg, (char*)&rsp, sizeof(rsp));
-
 }
 void TradeApiHandler::RspOrderInsert(const ErrorMessage& msg, const OrderInsertRsp& rsp, uint32_t gatewayReqId)
 {

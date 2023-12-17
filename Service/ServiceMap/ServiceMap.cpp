@@ -4,8 +4,17 @@
 uint32_t ServiceMap::gatewayReqId_ = 0;
 void ServiceMap::AddNewSession(const std::string& loginStr, SocketSession* session)
 {
-    loginStr2SocketSession_[loginStr].insert(session);
-    INFO("Add new session, loginStr: {}", loginStr);
+    
+    if (loginStr2SocketSession_[loginStr].count(session))
+    {
+        INFO("same loginStr, same session already");
+    }
+    else
+    {
+        loginStr2SocketSession_[loginStr].insert(session);
+        INFO("Add new session, loginStr: {}", loginStr);
+    }
+    
 }
 
 void ServiceMap::RemoveThisSession(SocketSession* session)
